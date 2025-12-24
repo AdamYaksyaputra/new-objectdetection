@@ -59,6 +59,56 @@ export default function Dashboard() {
   const [toTime, setToTime] = useState(null);
   const [valueFromTime, setValueFromTime] = useState(null);
   const [valueToTime, setValueToTime] = useState(null);
+  const [knownPendingIds, setKnownPendingIds] = useState(() => {
+    const stored = localStorage.getItem('knownPendingIds');
+    return stored ? JSON.parse(stored) : [];
+  });
+
+  // Request notification permission on mount
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  // Function to show browser notification
+  const showBrowserNotification = (message) => {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('🚨 Sensor Alert - e-Monitoring', {
+        body: message,
+        icon: '/shield 2.png',
+        tag: 'sensor-alert-' + Date.now(),
+      });
+    }
+  };
+
+  // Check for new triggered sensors
+  const checkForNewTriggers = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/historys/token`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      const pendingAlerts = response.data.filter(h => h.status === 1);
+      const currentPendingIds = pendingAlerts.map(h => h.id);
+
+      // Find NEW pending IDs that weren't known before
+      const newTriggers = pendingAlerts.filter(h => !knownPendingIds.includes(h.id));
+
+      if (newTriggers.length > 0) {
+        // Show notification for new triggers
+        newTriggers.forEach(alert => {
+          showBrowserNotification(`Sensor ${alert.sensor?.code || 'Unknown'} telah tertrigger! Membutuhkan penanganan.`);
+          toast.warning(`🚨 Sensor ${alert.sensor?.code || ''} tertrigger!`);
+        });
+      }
+
+      // Update known pending IDs
+      setKnownPendingIds(currentPendingIds);
+      localStorage.setItem('knownPendingIds', JSON.stringify(currentPendingIds));
+    } catch (error) {
+      console.error('Error checking triggers:', error);
+    }
+  };
 
   const handleSave = async () => {
     try {
@@ -85,9 +135,20 @@ export default function Dashboard() {
 
   const [sensorData, setSensorData] = useState([]);
 
+  // Initial data fetch and auto-refresh every 40 seconds
   useEffect(() => {
     fetchDataSensor();
     fetchDataBranch();
+    checkForNewTriggers();
+
+    // Auto-refresh every 40 seconds
+    const interval = setInterval(() => {
+      fetchDataSensor();
+      fetchDataBranch();
+      checkForNewTriggers();
+    }, 40000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const fetchDataSensor = async () => {
@@ -130,17 +191,13 @@ export default function Dashboard() {
     setToTime(timeString);
   };
 
-  useEffect(() => {
-    console.log("SATTT ", fromTime, toTime);
-  }, [fromTime, toTime]);
-
   return (
     <>
       <Grid templateColumns="repeat(2, 1fr)" gap={2} pt={{ base: "120px", md: "75px" }}>
         <Card p={4} color="black" borderRadius="lg" boxShadow="md" width="100%">
 
           <Flex justifyContent="space-between" alignItems="center">
-          <Text fontSize="xl" fontWeight="bold" color={textColor}> Alarm Sensor</Text>
+            <Text fontSize="xl" fontWeight="bold" color={textColor}> Alarm Sensor</Text>
             <Flex justifyContent="space-between" alignItems="center">
               <TimePicker
                 format="HH:mm"

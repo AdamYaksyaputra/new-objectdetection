@@ -49,7 +49,7 @@ function TablesHistory() {
     }
   };
 
-  console.log("history data",historyData);
+  console.log("history data", historyData);
 
   return (
     <Tbody>
@@ -87,13 +87,29 @@ function TablesHistory() {
             </Badge>
           </Td>
           <Td>
+            <Badge
+              bg={history.status === 1 ? "yellow.400" : "green.400"}
+              color={history.status === 1 ? "gray.800" : "white"}
+              fontSize="16px"
+              p="3px 10px"
+              borderRadius="8px"
+            >
+              {history.status === 1 ? "Notifikasi Terkirim" : "Selesai"}
+            </Badge>
+          </Td>
+          <Td>
             <Text fontSize="md" color={textColor} fontWeight="bold" pb=".5rem">
-              {moment(history.date).format("HH:mm")}
+              {moment(history.createdAt).format("HH:mm")}
             </Text>
           </Td>
           <Td>
             <Text fontSize="md" color={textColor} fontWeight="bold" pb=".5rem">
-              {moment(history.date).format("DD MM YYYY")}
+              {moment(history.updatedAt).format("HH:mm")}
+            </Text>
+          </Td>
+          <Td>
+            <Text fontSize="md" color={textColor} fontWeight="bold" pb=".5rem">
+              {moment(history.date).format("DD MMM YYYY")}
             </Text>
           </Td>
           <Td>

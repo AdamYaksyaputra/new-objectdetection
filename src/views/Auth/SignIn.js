@@ -30,7 +30,7 @@ function SignIn() {
   const OBJStyle = { top: "2px", left: "26%", position: "absolute" };
   const shieldStyle = { top: "-1px", left: "18%", position: "absolute" };
   const boxStyle = { border: "1px solid #FFFFFF", borderRadius: "20px", height: "505px", width: "585px", boxShadow: "0px 0px 20px 7px rgba(0, 0, 0, 0.1)", };
- 
+
   // Login jwt
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -48,8 +48,8 @@ function SignIn() {
       // add data user to local storage from response data
       localStorage.setItem('user', JSON.stringify(response.data.user));
 
-      toast.success("Welcome to ObjectDetection!")
-      
+      toast.success("Welcome to e-Monitoring!")
+
       setTimeout(() => {
         window.location.href = '/dashboard';
       }, 2000);
@@ -61,7 +61,7 @@ function SignIn() {
         console.error("Network Error:", error.message);
         return;
       }
-      
+
       // Handle HTTP errors (401, 400, etc.)
       if (error.response.status === 401 || error.response.status === 400) {
         toast.error("Email or password is wrong!");

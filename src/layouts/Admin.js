@@ -126,10 +126,10 @@ export default function Dashboard(props) {
         // Don't redirect on network errors, just log
         return;
       }
-      
+
       // Handle HTTP errors
       console.log("ERROR ", error.response.status);
-      if(error.response.status === 401) {
+      if (error.response.status === 401) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         window.location.href = "/login";
@@ -148,7 +148,7 @@ export default function Dashboard(props) {
     <ChakraProvider theme={theme} resetCss={false}>
       <Sidebar
         routes={routes}
-        logoText={"ObjectDetection"}
+        logoText={"e-Monitoring"}
         display="none"
         sidebarVariant={sidebarVariant}
         {...rest}
@@ -162,7 +162,7 @@ export default function Dashboard(props) {
         <Portal>
           <AdminNavbar
             onOpen={onOpen}
-            logoText={"ObjectDetection"}
+            logoText={"e-Monitoring"}
             brandText={getActiveRoute(routes)}
             secondary={getActiveNavbar(routes)}
             fixed={fixed}

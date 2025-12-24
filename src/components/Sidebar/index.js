@@ -51,7 +51,7 @@ function Sidebar(props) {
           borderRadius={sidebarRadius}
         >
           <SidebarContent routes={routes}
-            logoText={"Object Detection"}
+            logoText={"e-Monitoring"}
             display="none"
             sidebarVariant={sidebarVariant}
           />

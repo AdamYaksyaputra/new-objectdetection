@@ -197,7 +197,10 @@ function Reports() {
     };
 
     const formatTime = (dateString) => {
-        return new Date(dateString).toLocaleTimeString("id-ID", {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return 'N/A';
+        return date.toLocaleTimeString("id-ID", {
             hour: "2-digit",
             minute: "2-digit",
         });
@@ -205,11 +208,34 @@ function Reports() {
 
     return (
         <Flex direction="column" pt={{ base: "120px", md: "75px" }}>
-            {/* Filter Area */}
+            {/* Page Header */}
+            <Card mb="20px" bg={cardBg}>
+                <CardHeader p="12px 5px" mb="12px">
+                    <Flex direction="column">
+                        <Flex align="center" gap="3">
+                            <Box
+                                bg={binusBlue}
+                                p="2"
+                                borderRadius="md"
+                            >
+                                <Text fontSize="lg" color="white">📊</Text>
+                            </Box>
+                            <Text fontSize="xl" fontWeight="bold" color={textColor}>
+                                Security Analytics - Evaluasi Performa
+                            </Text>
+                        </Flex>
+                        <Text fontSize="sm" color="gray.500" mt="2">
+                            Ringkasan statistik dan analisis performa sistem keamanan untuk evaluasi manajemen
+                        </Text>
+                    </Flex>
+                </CardHeader>
+            </Card>
+
+            {/* Filter Controls */}
             <Card mb="20px" bg={cardBg}>
                 <CardHeader>
-                    <Text fontSize="xl" fontWeight="bold" color={textColor}>
-                        Security Reports
+                    <Text fontSize="lg" fontWeight="bold" color={textColor}>
+                        Filter Laporan
                     </Text>
                 </CardHeader>
                 <CardBody>
@@ -395,17 +421,19 @@ function Reports() {
                                 <Thead>
                                     <Tr>
                                         <Th>Date</Th>
-                                        <Th>Time</Th>
+                                        <Th>Alert Time</Th>
+                                        <Th>Report Time</Th>
                                         <Th>Branch</Th>
                                         <Th>Sensor</Th>
                                         <Th>Security</Th>
+                                        <Th>Emergency</Th>
                                         <Th>Status</Th>
                                     </Tr>
                                 </Thead>
                                 <Tbody>
                                     {preview.length === 0 ? (
                                         <Tr>
-                                            <Td colSpan={6} textAlign="center" py="8">
+                                            <Td colSpan={8} textAlign="center" py="8">
                                                 <Text color="gray.500">No data available for selected period</Text>
                                             </Td>
                                         </Tr>
@@ -416,7 +444,8 @@ function Reports() {
                                                 bg={item.isEmergency ? "red.50" : "transparent"}
                                             >
                                                 <Td>{formatDate(item.date)}</Td>
-                                                <Td>{formatTime(item.date)}</Td>
+                                                <Td>{formatTime(item.createdAt)}</Td>
+                                                <Td>{formatTime(item.updatedAt)}</Td>
                                                 <Td>{item.branch}</Td>
                                                 <Td>{item.sensorCode}</Td>
                                                 <Td>{item.security}</Td>
@@ -425,6 +454,13 @@ function Reports() {
                                                         colorScheme={item.isEmergency ? "red" : "green"}
                                                     >
                                                         {item.isEmergency ? "Emergency" : "Normal"}
+                                                    </Badge>
+                                                </Td>
+                                                <Td>
+                                                    <Badge
+                                                        colorScheme={item.status === 1 ? "yellow" : "green"}
+                                                    >
+                                                        {item.status === 1 ? "Notifikasi Terkirim" : "Selesai"}
                                                     </Badge>
                                                 </Td>
                                             </Tr>
