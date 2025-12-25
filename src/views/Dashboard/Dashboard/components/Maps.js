@@ -20,12 +20,14 @@ import CardHeader from "components/Card/CardHeader.js";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { API_URL } from "constant/data";
+import ReactApexChart from "react-apexcharts";
 
 export default function Maps() {
     const textColor = useColorModeValue("gray.700", "white");
     const [sensors, setSensors] = useState([]);
     const [pendingHistories, setPendingHistories] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [pieData, setPieData] = useState([0, 0]);
 
     useEffect(() => {
         fetchData();
@@ -49,6 +51,12 @@ export default function Maps() {
             // Filter pending histories (status = 1)
             const pending = historyRes.data.filter(h => h.status === 1);
             setPendingHistories(pending);
+
+            // Calculate pie chart data
+            const emergency = historyRes.data.filter(a => a.isEmergency === true).length;
+            const nonEmergency = historyRes.data.filter(a => a.isEmergency === false || a.isEmergency === null).length;
+            setPieData([emergency, nonEmergency]);
+
             setLoading(false);
         } catch (error) {
             console.error('Error fetching map data:', error);
@@ -61,27 +69,61 @@ export default function Maps() {
         return pendingHistories.some(h => h.sensor_id === sensorId);
     };
 
+    // Pie Chart Options
+    const pieChartOptions = {
+        chart: { type: 'donut' },
+        labels: ['Emergency', 'Non-Emergency'],
+        colors: ['#FC8181', '#68D391'],
+        legend: {
+            position: 'bottom',
+            fontSize: '14px',
+        },
+        dataLabels: {
+            enabled: true,
+            formatter: (val) => Math.round(val) + '%',
+        },
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: '60%',
+                    labels: {
+                        show: true,
+                        total: {
+                            show: true,
+                            label: 'Total',
+                            formatter: (w) => w.globals.seriesTotals.reduce((a, b) => a + b, 0),
+                        },
+                    },
+                },
+            },
+        },
+    };
+
     return (
         <Card overflowX={{ sm: "scroll", xl: "hidden" }} boxShadow="md">
             <CardHeader p='6px 0px 22px 0px'>
                 <Text fontSize='xl' color={textColor} fontWeight='bold'>
-                    Location & Sensor Status
+                    Alert Overview & Sensor Status
                 </Text>
             </CardHeader>
             <CardBody>
-                <Flex direction="row" gap="6" h="550px">
-                    {/* Map - 50% width */}
-                    <Box w="50%" h="100%" borderRadius="lg" overflow="hidden" border="1px solid" borderColor="gray.200">
-                        <iframe
-                            title="Location Map"
-                            width="100%"
-                            height="100%"
-                            frameBorder="0"
-                            scrolling="no"
-                            marginHeight="0"
-                            marginWidth="0"
-                            src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=en&amp;q=Jl.%20Araya%20Mansion%20No.8%20-%2022,%20Genitri,%20Tirtomoyo,%20Kec.%20Pakis,%20Kabupaten%20Malang,%20Jawa%20Timur%2065154+(BINUS%20University%20Malang)&amp;t=&amp;z=18&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
-                        />
+                <Flex direction="row" gap="6" h="450px">
+                    {/* Pie Chart - 50% width */}
+                    <Box w="50%" h="100%" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
+                        <Text fontSize='lg' fontWeight='bold' color={textColor} mb="4">
+                            Emergency vs Non-Emergency
+                        </Text>
+                        {pieData[0] + pieData[1] > 0 ? (
+                            <ReactApexChart
+                                options={pieChartOptions}
+                                series={pieData}
+                                type="donut"
+                                width="350"
+                                height="350"
+                            />
+                        ) : (
+                            <Text color="gray.500">No data available</Text>
+                        )}
                     </Box>
 
                     {/* Sensor Status Table - 50% width */}

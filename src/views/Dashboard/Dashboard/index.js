@@ -40,7 +40,8 @@ import Bell from "assets/img/Bell.png";
 import Card from "components/Card/Card";
 import { tablesTableData, historyData } from "variables/general";
 import HistoryDashboard from "./components/HistoryDashboard";
-import Maps from "./components/Maps";
+import SensorStatusTable from "./components/SensorStatusTable";
+import { AlertsLineChart, SensorAlertsBarChart, EmergencyPieChart } from "./components/AlertsCharts";
 import axios from "axios";
 import { useEffect } from "react";
 import moment from 'moment';
@@ -249,8 +250,17 @@ export default function Dashboard() {
           data={historyData}
         />
       </Grid >
-      <Grid pt={{ base: "120px", md: "10px" }}>
-        <Maps />
+
+      {/* Charts Section */}
+      <Grid templateColumns="repeat(2, 1fr)" gap={4} pt={{ base: "20px", md: "20px" }}>
+        <AlertsLineChart />
+        <SensorAlertsBarChart />
+      </Grid>
+
+      {/* Pie Chart & Sensor Status Section */}
+      <Grid templateColumns="repeat(2, 1fr)" gap={4} pt={{ base: "20px", md: "20px" }}>
+        <EmergencyPieChart />
+        <SensorStatusTable />
       </Grid>
     </>
   );

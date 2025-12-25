@@ -9,7 +9,8 @@ import {
   Thead,
   Th,
   Box,
-  Spinner,
+  Skeleton,
+  SkeletonText,
 } from "@chakra-ui/react";
 import React from "react";
 import axios from "axios";
@@ -46,13 +47,18 @@ function TablesTableRow() {
     }
   };
 
-  if (loading) {
-    return (
-      <Flex justify="center" align="center" h="150px">
-        <Spinner size="md" color="blue.500" />
-      </Flex>
-    );
-  }
+  // Loading skeleton rows
+  const SkeletonRows = () => (
+    <>
+      {[1, 2, 3].map((i) => (
+        <Tr key={i}>
+          <Td><Skeleton height="16px" width="100px" /></Td>
+          <Td><Skeleton height="16px" width="150px" /></Td>
+          <Td><Skeleton height="20px" width="60px" borderRadius="full" /></Td>
+        </Tr>
+      ))}
+    </>
+  );
 
   return (
     <Box maxH="250px" overflowY="auto">
@@ -64,7 +70,9 @@ function TablesTableRow() {
         </Tr>
       </Thead>
       <Tbody>
-        {userData.length === 0 ? (
+        {loading ? (
+          <SkeletonRows />
+        ) : userData.length === 0 ? (
           <Tr>
             <Td colSpan="3">
               <Text textAlign="center" color="gray.500">Tidak ada data</Text>
