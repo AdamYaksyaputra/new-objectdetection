@@ -239,34 +239,66 @@ function HistoryPage() {
                   </Box>
                 </Flex>
 
+                {/* Multiple Photos Gallery */}
                 {selectedEvent.photo_url && (
                   <Box mt="4">
-                    <Text fontWeight="bold" color="gray.500" mb="2">Bukti Foto: (klik untuk memperbesar)</Text>
-                    <Image
-                      src={selectedEvent.photo_url}
-                      alt="Evidence"
-                      borderRadius="md"
-                      maxH="300px"
-                      objectFit="contain"
-                      cursor="pointer"
-                      _hover={{ opacity: 0.8, transform: "scale(1.02)" }}
-                      transition="all 0.2s"
-                      onClick={() => {
-                        setPhotoUrl(selectedEvent.photo_url);
-                        onPhotoOpen();
-                      }}
-                      fallback={
-                        <Flex
-                          bg="gray.100"
-                          h="200px"
-                          align="center"
-                          justify="center"
-                          borderRadius="md"
-                        >
-                          <Text color="gray.500">Foto tidak tersedia</Text>
-                        </Flex>
-                      }
-                    />
+                    <Text fontWeight="bold" color="gray.500" mb="2">
+                      Bukti Foto ({Array.isArray(selectedEvent.photo_url) ? selectedEvent.photo_url.length : 1}):
+                    </Text>
+                    <Flex gap="3" flexWrap="wrap">
+                      {(Array.isArray(selectedEvent.photo_url)
+                        ? selectedEvent.photo_url
+                        : [selectedEvent.photo_url]
+                      ).map((url, index) => (
+                        <Box key={index} position="relative">
+                          <Image
+                            src={url}
+                            alt={`Evidence ${index + 1}`}
+                            borderRadius="md"
+                            boxSize="120px"
+                            objectFit="cover"
+                            cursor="pointer"
+                            border="2px solid"
+                            borderColor="gray.200"
+                            _hover={{
+                              opacity: 0.8,
+                              transform: "scale(1.05)",
+                              borderColor: binusBlue
+                            }}
+                            transition="all 0.2s"
+                            onClick={() => {
+                              setPhotoUrl(url);
+                              onPhotoOpen();
+                            }}
+                            fallback={
+                              <Flex
+                                bg="gray.100"
+                                boxSize="120px"
+                                align="center"
+                                justify="center"
+                                borderRadius="md"
+                              >
+                                <Text color="gray.500" fontSize="xs">N/A</Text>
+                              </Flex>
+                            }
+                          />
+                          <Badge
+                            position="absolute"
+                            top="1"
+                            left="1"
+                            bg={binusBlue}
+                            color="white"
+                            fontSize="10px"
+                            borderRadius="full"
+                          >
+                            {index + 1}
+                          </Badge>
+                        </Box>
+                      ))}
+                    </Flex>
+                    <Text fontSize="xs" color="gray.400" mt="2">
+                      Klik foto untuk memperbesar
+                    </Text>
                   </Box>
                 )}
               </Box>
