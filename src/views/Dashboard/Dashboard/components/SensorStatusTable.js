@@ -96,7 +96,7 @@ export default function SensorStatusTable() {
                                         </Td>
                                         <Td>
                                             <Text fontSize="xs" color="gray.500">
-                                                {sensor.latitude?.toFixed(4)}, {sensor.longitude?.toFixed(4)}
+                                                {parseFloat(sensor.latitude)?.toFixed(4)}, {parseFloat(sensor.longitude)?.toFixed(4)}
                                             </Text>
                                         </Td>
                                     </Tr>
